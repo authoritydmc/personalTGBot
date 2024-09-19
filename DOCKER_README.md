@@ -17,7 +17,7 @@ docker build -t telegram-bot .
 To run the Docker container with automatic restart and mount the `data` folder to the host system, use:
 
 ```sh
-docker run -it --restart unless-stopped -p 5000:5000 -v /path/on/host/data:/app/data telegram-bot
+docker run -it --restart unless-stopped --name telegram-bot -p 5000:5000 -v /path/on/host/data:/app/data telegram-bot
 ```
 
 **Explanation**:
