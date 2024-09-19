@@ -7,32 +7,43 @@ on:
     branches: [ "main" ]
 
 jobs:
-
   build:
-
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v4
-    - name: Build the Docker image
-      id: build
-      run: |
-        TIMESTAMP=$(date +'%Y%m%d%H%M%S')
-        docker build . --file Dockerfile --tag eureka-server:$TIMESTAMP
-        echo "TIMESTAMP=$TIMESTAMP" >> $GITHUB_ENV
+      # Step to check out the repository
+      - uses: actions/checkout@v4
 
-    - name: Log in to Docker Hub
-      uses: docker/login-action@v2
-      with:
-        username: ${{ secrets.DOCKER_HUB_USERNAME }}
-        password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
+      # Step to build the Docker image and set the tag once
+      - name: Build the Docker image
+        id: build
+        run: |
+          # Get current timestamp
+          TIMESTAMP=$(date +'%Y%m%d%H%M%S')
+          IMAGE_NAME=tgbot
+          # Build the Docker image with the timestamp tag
+          docker build . --file Dockerfile --tag ${IMAGE_NAME}:${TIMESTAMP}
+          # Set the image name and timestamp in the environment for reuse
+          echo "IMAGE_NAME=${IMAGE_NAME}" >> $GITHUB_ENV
+          echo "TIMESTAMP=${TIMESTAMP}" >> $GITHUB_ENV
 
-    - name: Tag Docker image
-      run: |
-        docker tag tgbot:${{ env.TIMESTAMP }} ${{ secrets.DOCKER_HUB_USERNAME }}/tgbot:latest
-        docker tag tgbot:${{ env.TIMESTAMP }} ${{ secrets.DOCKER_HUB_USERNAME }}/tgbot:${{ env.TIMESTAMP }}
+      # Step to log in to Docker Hub
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKER_HUB_USERNAME }}
+          password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
 
-    - name: Push Docker images to Docker Hub
-      run: |
-        docker push ${{ secrets.DOCKER_HUB_USERNAME }}/tgbot:latest
-        docker push ${{ secrets.DOCKER_HUB_USERNAME }}/tgbot:${{ env.TIMESTAMP }}
+      # Step to tag the Docker image
+      - name: Tag Docker image
+        run: |
+          # Tag the image with 'latest' and the timestamp tag
+          docker tag ${{ env.IMAGE_NAME }}:${{ env.TIMESTAMP }} ${{ secrets.DOCKER_HUB_USERNAME }}/tgbot:latest
+          docker tag ${{ env.IMAGE_NAME }}:${{ env.TIMESTAMP }} ${{ secrets.DOCKER_HUB_USERNAME }}/tgbot:${{ env.TIMESTAMP }}
+
+      # Step to push Docker images to Docker Hub
+      - name: Push Docker images to Docker Hub
+        run: |
+          # Push both 'latest' and timestamp-tagged images to Docker Hub
+          docker push ${{ secrets.DOCKER_HUB_USERNAME }}/tgbot:latest
+          docker push ${{ secrets.DOCKER_HUB_USERNAME }}/tgbot:${{ env.TIMESTAMP }}
