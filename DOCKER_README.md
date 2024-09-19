@@ -14,35 +14,19 @@ docker build -t telegram-bot .
 
 ### Run the Docker Container
 
-To run the Docker container, you need to pass the API credentials either via environment variables or command-line arguments. If neither is provided, the bot will prompt you to enter the credentials interactively on the first run.
-
-#### Using Environment Variables
-
-Set the environment variables `TELEGRAM_API_ID` and `TELEGRAM_API_HASH` for the API credentials:
+To run the Docker container and ensure that the `data` folder is mounted to the host system, use the following command:
 
 ```sh
-docker run -d \
-  -e TELEGRAM_API_ID=your_api_id \
-  -e TELEGRAM_API_HASH=your_api_hash \
+docker run -it \
   -p 5000:5000 \
+  -v /path/on/host/data:/app/data \
   telegram-bot
 ```
 
-#### Using Command-Line Arguments
+**Explanation**:
+- `-v /path/on/host/data:/app/data`: Mounts the `data` directory on the host (`/path/on/host/data`) to the `data` directory in the container (`/app/data`). Replace `/path/on/host/data` with the path to the directory on your host system where you want to store the data files.
 
-Alternatively, pass the API credentials as command-line arguments:
-
-```sh
-docker run -d \
-  -p 5000:5000 \
-  telegram-bot \
-  --api-id your_api_id \
-  --api-hash your_api_hash
-```
-
-### Interactive Setup
-
-If no API credentials are provided through environment variables or command-line arguments, the bot will prompt you to enter them interactively on the first run. Ensure you have a terminal available to input the credentials.
+During this first run, the bot will prompt you to enter the `api_id` and `api_hash`. These credentials will be saved in the `data` directory on the host system, ensuring persistence and easy access.
 
 ### Exposed Ports
 
@@ -50,7 +34,7 @@ If no API credentials are provided through environment variables or command-line
 
 ### Notes
 
-- Make sure your database is correctly configured and accessible from the Docker container.
+- Ensure that the directory you mount (`/path/on/host/data`) exists on your host system and has the appropriate permissions for Docker to read and write.
 - The bot will start and load all modules from the `modules` directory.
 - Flask application logs will be visible in the Docker container logs.
 
@@ -78,4 +62,3 @@ docker logs <container_id>
 
 Replace `<container_id>` with the actual ID of the running container.
 
----
