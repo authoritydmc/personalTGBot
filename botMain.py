@@ -15,6 +15,7 @@ logging.basicConfig(format='[%(levelname) 5s/%(asctime)s] %(name)s: %(message)s'
 logger = logging.getLogger(__name__)
 
 MODULES_FOLDER = "modules"
+DATA_FOLDER = "data"  # Define the data folder
 
 def run_flask_app():
     """Run the Flask app and handle exceptions."""
@@ -85,8 +86,14 @@ async def main():
 
     logger.info(f"Starting TelegramClient with API ID: {api_id}")
 
-    # The first parameter is the .session file name (absolute paths allowed)
-    async with TelegramClient('anon', api_id, api_hash) as client:
+    # Ensure the data folder exists
+    os.makedirs(DATA_FOLDER, exist_ok=True)
+    
+    # Specify the session file path within the data folder
+    session_file_path = os.path.join(DATA_FOLDER, 'anon.session')
+
+    # Initialize TelegramClient with the session file path in the 'data' folder
+    async with TelegramClient(session_file_path, api_id, api_hash) as client:
         try:
             # Load modules and send status updates
             loaded_modules = await load_modules(client)
