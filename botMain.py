@@ -3,6 +3,8 @@ import json
 import argparse
 from telethon import TelegramClient
 
+import main from userbot.readIncomingMessage
+
 # Define the config file path
 CONFIG_FILE = 'config.json'
 
@@ -47,4 +49,4 @@ api_id = int(api_id)
 
 # The first parameter is the .session file name (absolute paths allowed)
 with TelegramClient('anon', api_id, api_hash) as client:
-    client.loop.run_until_complete(client.send_message('me', 'Hello, myself!'))
+    
