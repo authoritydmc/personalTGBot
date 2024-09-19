@@ -37,7 +37,7 @@ def get_reading_users():
     cursor = conn.cursor()
     try:
         cursor.execute('SELECT username FROM reading_users')
-        users = cursor.fetchall()
+        users = cursor.fetchall()   
         return [user[0] for user in users]
     except sqlite3.Error as e:
         logger.error(f"Error retrieving reading users: {e}")
