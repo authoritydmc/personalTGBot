@@ -17,7 +17,6 @@ async def run(client):
         if 'hello' in event.raw_text.lower():
             logger.info("Replying with 'hi!'")
             await event.reply('hi!')
-        else:
-            logger.info("Message does not contain 'hello'")
+
 
     logger.info("userBot is listening for new messages.")

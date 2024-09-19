@@ -7,7 +7,8 @@ import config  # Import the config module
 import asyncio
 
 # Configure logging for this script
-logging.basicConfig(level=logging.INFO)
+logging.basicConfig(format='[%(levelname) 5s/%(asctime)s] %(name)s: %(message)s',
+                    level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 MODULES_FOLDER = "modules"

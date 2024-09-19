@@ -2,3 +2,4 @@ config.json
 *.session
 Pipfile
 data
+*.session-journal
