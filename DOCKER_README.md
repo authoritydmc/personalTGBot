@@ -14,19 +14,21 @@ docker build -t telegram-bot .
 
 ### Run the Docker Container
 
-To run the Docker container and ensure that the `data` folder is mounted to the host system, use the following command:
+To run the Docker container with automatic restart and mount the `data` folder to the host system, use the following command:
 
 ```sh
 docker run -it \
+  --restart unless-stopped \
   -p 5000:5000 \
   -v /path/on/host/data:/app/data \
   telegram-bot
 ```
 
 **Explanation**:
+- `--restart unless-stopped`: This policy ensures that the container is automatically restarted if it exits due to an error or system reboot, but not if it is manually stopped.
 - `-v /path/on/host/data:/app/data`: Mounts the `data` directory on the host (`/path/on/host/data`) to the `data` directory in the container (`/app/data`). Replace `/path/on/host/data` with the path to the directory on your host system where you want to store the data files.
 
-During this first run, the bot will prompt you to enter the `api_id` and `api_hash`. These credentials will be saved in the `data` directory on the host system, ensuring persistence and easy access.
+During the first run, the bot will prompt you to enter the `api_id` and `api_hash`. These credentials will be saved in the `data` directory on the host system, ensuring persistence and easy access.
 
 ### Exposed Ports
 
@@ -40,7 +42,7 @@ During this first run, the bot will prompt you to enter the `api_id` and `api_ha
 
 ## Stopping the Container
 
-To stop the running container, use:
+To stop the running container manually, use:
 
 ```sh
 docker stop <container_id>
@@ -52,7 +54,7 @@ Replace `<container_id>` with the actual ID of the running container, which you 
 docker ps
 ```
 
-## Logs
+### Logs
 
 To view the logs of the running container:
 
