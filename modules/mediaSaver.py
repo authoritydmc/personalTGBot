@@ -69,7 +69,9 @@ async def run(client):
                     f"Photo received from: {user_identifier}\n"
                     f"Message ID: {event.message.id}\n"
                     f"Caption: {event.message.text if event.message.text else 'No caption'}"
+                    f"Status:{status_message}"
                 )
+                await status_message.delete()
                 
                 await client.send_message('me', details, file=file_path)
                 logger.info(f"Photo and details sent to yourself")
@@ -91,8 +93,9 @@ async def run(client):
                         f"Video received from: {user_identifier}\n"
                         f"Message ID: {event.message.id}\n"
                         f"Caption: {event.message.text if event.message.text else 'No caption'}"
-                    )
-
+                       f"Status:{status_message}"
+                        )
+                    await status_message.delete()
                     await client.send_message('me', details, file=file_path)
                     logger.info(f"Video and details sent to yourself")
 
