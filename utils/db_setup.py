@@ -3,8 +3,8 @@ import os
 import logging
 
 # Define the path to the SQLite database
-DB_PATH = 'bot.db'
-
+DATA_FOLDER = 'data'
+DB_PATH = os.path.join(DATA_FOLDER, 'bot.db')
 # Configure logging for this module
 logger = logging.getLogger(__name__)
 
