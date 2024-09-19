@@ -69,7 +69,7 @@ async def run(client):
                     f"Photo received from: {user_identifier}\n"
                     f"Message ID: {event.message.id}\n"
                     f"Caption: {event.message.text if event.message.text else 'No caption'}"
-                    f"Status:{status_message}"
+                    f"Status:{status_message.message}"
                 )
                 await status_message.delete()
                 
@@ -93,7 +93,7 @@ async def run(client):
                         f"Video received from: {user_identifier}\n"
                         f"Message ID: {event.message.id}\n"
                         f"Caption: {event.message.text if event.message.text else 'No caption'}"
-                       f"Status:{status_message}"
+                       f"Status:{status_message.message}"
                         )
                     await status_message.delete()
                     await client.send_message('me', details, file=file_path)
