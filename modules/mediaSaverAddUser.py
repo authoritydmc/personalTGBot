@@ -1,10 +1,15 @@
 import logging
 import re
 from telethon import events
-from utils import db_util
+from utils import db_util,command_registry
 
 # Configure logging for this module
 logger = logging.getLogger(__name__)
+
+# Register commands with descriptions
+command_registry.register_command("addUser", "Add a user to the reading list")
+command_registry.register_command("removeUser", "Remove a user from the reading list")
+command_registry.register_command("getUsers", "Get the list of users in the reading list")
 
 # Define a case-insensitive regex pattern to match all commands
 command_pattern = re.compile(r'\.(addUser|removeUser|getUsers)\s*(\w*)', re.IGNORECASE)
