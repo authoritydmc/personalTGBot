@@ -6,7 +6,7 @@ This project sets up a Telegram bot using the Telethon library and integrates a 
 
 ### Build the Docker Image
 
-To build the Docker image, run the following command from the root directory of the project:
+To build the Docker image, run:
 
 ```sh
 docker build -t telegram-bot .
@@ -14,14 +14,10 @@ docker build -t telegram-bot .
 
 ### Run the Docker Container
 
-To run the Docker container with automatic restart and mount the `data` folder to the host system, use the following command:
+To run the Docker container with automatic restart and mount the `data` folder to the host system, use:
 
 ```sh
-docker run -it \
-  --restart unless-stopped \
-  -p 5000:5000 \
-  -v /path/on/host/data:/app/data \
-  telegram-bot
+docker run -it --restart unless-stopped -p 5000:5000 -v /path/on/host/data:/app/data telegram-bot
 ```
 
 **Explanation**:
@@ -56,7 +52,7 @@ docker ps
 
 ### Logs
 
-To view the logs of the running container:
+To view the logs of the running container, use:
 
 ```sh
 docker logs <container_id>
@@ -64,3 +60,4 @@ docker logs <container_id>
 
 Replace `<container_id>` with the actual ID of the running container.
 
+---
