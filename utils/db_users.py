@@ -38,7 +38,6 @@ def get_reading_users():
     try:
         cursor.execute('SELECT username FROM reading_users')
         users = cursor.fetchall()
-        logger.info(f"Retrieved reading users: {[user[0] for user in users]}")
         return [user[0] for user in users]
     except sqlite3.Error as e:
         logger.error(f"Error retrieving reading users: {e}")
