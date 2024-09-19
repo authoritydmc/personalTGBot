@@ -4,6 +4,7 @@ import importlib
 import os
 import threading
 import asyncio
+import socket
 from telethon import TelegramClient
 from utils import db_util
 from webapp.app import app as flask_app  # Import the Flask app instance
@@ -77,6 +78,11 @@ async def main():
     # Ensure api_id is an integer as required by Telethon
     api_id = int(api_id)
 
+    # Fetch host details
+    hostname = socket.gethostname()
+    ip_address = socket.gethostbyname(hostname)
+    logger.info(f"Running on host: {hostname} ({ip_address})")
+
     logger.info(f"Starting TelegramClient with API ID: {api_id}")
 
     # The first parameter is the .session file name (absolute paths allowed)
@@ -88,7 +94,8 @@ async def main():
                 f"Bot has started successfully!\n"
                 f"Modules loaded: {', '.join(loaded_modules)}\n"
                 f"Database tables: {(tables)}\n"
-                f"Flask application is running on port 5000."
+                f"Flask application is running on port 5000.\n"
+                f"Host: {hostname} ({ip_address})"
             )
             await client.send_message('me', status_message)
 

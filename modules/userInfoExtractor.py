@@ -41,10 +41,10 @@ async def run(client):
 
                 # Prepare message to send details to you (the bot user)
                 message_to_send = (
-                    f"User ID: {user_id}\n"
+                    f"User ID: `{user_id}`\n"
                     f"First Name: {first_name}\n"
                     f"Last Name: {last_name}\n"
-                    f"Username: {username}\n"
+                    f"Username: `{username}`\n"
                 )
 
                 # Send the message to yourself
