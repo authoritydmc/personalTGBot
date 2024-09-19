@@ -12,7 +12,7 @@ async def run(client):
     
     logger.info("Setting up MediaSaver message handler...")
 
-    @client.on(events.NewMessage)
+    @client.on(events.NewMessage(incoming=True,outgoing=False))
     async def handler(event):
         # Determine sender info: username or user ID
         sender_username = event.sender.username if event.sender and event.sender.username else None

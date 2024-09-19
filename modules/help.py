@@ -12,17 +12,26 @@ logger = logging.getLogger(__name__)
 command_registry.register_command("help", "Show a list of available commands")
 
 async def run(client):
-    """Handle incoming messages using the client object passed from the main script"""
-
+    """Handle incoming messages using the client object passed from the main script."""
+    
     logger.info("Setting up help message handler...")
     
-    @client.on(events.NewMessage(outgoing=True,pattern=r'\.help'))
+    @client.on(events.NewMessage(outgoing=True, pattern=r'\.help'))
     async def handler(event):
+        # Fetch all commands from the command registry
         commands = command_registry.get_commands()
-        help_text = "Available commands:\n"
-        for command, description in commands.items():
-            help_text += f".{command}: {description}\n"
         
+        # Sort commands alphabetically (case-insensitive)
+        sorted_commands = sorted(commands.items(), key=lambda x: x[0].lower())
+        
+        # Build the help text
+        help_text = "Available commands:\n"
+        
+        # Iterate through sorted commands and add to the help text
+        for command, description in sorted_commands:
+            help_text += f"`.{command}`: {description}\n"  # Wrap the command in backticks for easier copying
+        
+        # Reply with the formatted help text
         await event.reply(help_text)
 
     logger.info("Help module is listening for the '.help' command.")
