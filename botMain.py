@@ -1,52 +1,66 @@
-import os
-import json
 import argparse
+import logging
+import importlib
+import os
 from telethon import TelegramClient
+import config  # Import the config module
+import asyncio
 
-import main from userbot.readIncomingMessage
+# Configure logging for this script
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
-# Define the config file path
-CONFIG_FILE = 'config.json'
+MODULES_FOLDER = "modules"
 
-# Function to load API credentials from config.json
-def load_config():
-    if os.path.exists(CONFIG_FILE):
-        with open(CONFIG_FILE, 'r') as file:
-            return json.load(file)
-    return {}
+async def load_modules(client):
+    """Dynamically load all modules from the 'modules' folder and run them"""
+    for module_name in os.listdir(MODULES_FOLDER):
+        if module_name.endswith(".py") and not module_name.startswith("__"):
+            module_path = f"{MODULES_FOLDER}.{module_name[:-3]}"
+            logger.info(f"Loading module: {module_name}")
+            
+            try:
+                module = importlib.import_module(module_path)
+                await module.run(client)  # Each module must have a 'run' function
+                logger.info(f"Module {module_name} loaded successfully.")
+            except Exception as e:
+                logger.error(f"Error loading module {module_name}: {e}")
 
-# Function to save API credentials to config.json
-def save_config(api_id, api_hash):
-    with open(CONFIG_FILE, 'w') as file:
-        json.dump({'api_id': api_id, 'api_hash': api_hash}, file)
+async def main():
+    """Main function to initialize the client and load modules"""
+    # Set up argparse to get command-line arguments if provided
+    parser = argparse.ArgumentParser(description='Telegram API client setup')
+    parser.add_argument('--api-id', type=int, help='Telegram API ID')
+    parser.add_argument('--api-hash', type=str, help='Telegram API Hash')
 
-# Set up argparse to get command-line arguments if provided
-parser = argparse.ArgumentParser(description='Telegram API client setup')
-parser.add_argument('--api-id', type=int, help='Telegram API ID')
-parser.add_argument('--api-hash', type=str, help='Telegram API Hash')
+    # Parse the arguments
+    args = parser.parse_args()
 
-# Parse the arguments
-args = parser.parse_args()
+    # Check for command-line arguments first, otherwise fall back to config
+    if args.api_id and args.api_hash:
+        api_id = args.api_id
+        api_hash = args.api_hash
+    else:
+        logger.info("No command-line arguments provided, loading API credentials from config.")
+        api_id, api_hash = config.get_api_credentials()
 
-# Load config from file if it exists
-config = load_config()
+    # Ensure api_id is an integer as required by Telethon
+    api_id = int(api_id)
 
-# Check for command-line arguments, environment variables, or config file
-api_id = args.api_id or os.getenv('TELEGRAM_API_ID') or config.get('api_id')
-api_hash = args.api_hash or os.getenv('TELEGRAM_API_HASH') or config.get('api_hash')
+    logger.info(f"Starting TelegramClient with API ID: {api_id}")
 
-# If api_id or api_hash is still not provided, ask the user for input
-if not api_id:
-    api_id = input("Please enter your Telegram API ID: ")
-if not api_hash:
-    api_hash = input("Please enter your Telegram API Hash: ")
+    # The first parameter is the .session file name (absolute paths allowed)
+    async with TelegramClient('anon', api_id, api_hash) as client:
+        try:
+            logger.info("Client connected. Loading bot modules...")
+            await load_modules(client)
+            logger.info("All modules loaded. Running the client...")
+            await client.run_until_disconnected()
+        except Exception as e:
+            logger.error(f"An error occurred: {e}")
 
-# Save the credentials to config.json for future use
-save_config(api_id, api_hash)
-
-# Ensure api_id is an integer as required by Telethon
-api_id = int(api_id)
-
-# The first parameter is the .session file name (absolute paths allowed)
-with TelegramClient('anon', api_id, api_hash) as client:
-    
+# Entry point for the script
+if __name__ == "__main__":
+    logger.info("Bot is starting...")
+    asyncio.run(main())
+    logger.info("Bot has stopped.")
