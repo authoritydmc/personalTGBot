@@ -20,7 +20,7 @@ async def run(client):
     logger.info("Setting up userBot message handler...")
 
     # Register the event handler dynamically using the client passed as a parameter
-    @client.on(events.NewMessage(pattern=command_pattern))
+    @client.on(events.NewMessage(outgoing=True,pattern=command_pattern))
     async def handler(event):
         # Match the command pattern
         match = command_pattern.search(event.raw_text)

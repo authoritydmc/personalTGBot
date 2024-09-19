@@ -80,4 +80,4 @@ def log_media_info(username, media_type, file_path):
     except Exception as e:
         logger.error(f"Failed to log media info for user '{username}': {e}")
 def log_all_tables():
-    logTables()
+    return logTables()

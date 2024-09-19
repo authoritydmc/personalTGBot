@@ -15,16 +15,18 @@ logger = logging.getLogger(__name__)
 
 MODULES_FOLDER = "modules"
 
+
 def run_flask_app():
     """Run the Flask app and handle exceptions."""
     try:
-        flask_app.run(debug=True, port=5000)  # Access the Flask app instance
+        flask_app.run(debug=False, port=5000)  # Access the Flask app instance
         logger.info("Flask application is running.")
     except Exception as e:
         logger.error(f"Flask application encountered an error: {e}")
 
 async def load_modules(client):
     """Dynamically load all modules from the 'modules' folder and run them"""
+    loaded_modules = []
     for module_name in os.listdir(MODULES_FOLDER):
         if module_name.endswith(".py") and not module_name.startswith("__"):
             module_path = f"{MODULES_FOLDER}.{module_name[:-3]}"
@@ -33,9 +35,11 @@ async def load_modules(client):
             try:
                 module = importlib.import_module(module_path)
                 await module.run(client)  # Each module must have a 'run' function
+                loaded_modules.append(module_name)
                 logger.info(f"Module {module_name} loaded successfully.")
             except Exception as e:
                 logger.error(f"Error loading module {module_name}: {e}")
+    return loaded_modules
 
 async def main():
     """Main function to initialize the client and load modules"""
@@ -49,7 +53,7 @@ async def main():
 
     # Initialize the database and log available tables
     db_util.initialize_db()
-    db_util.log_all_tables()
+    tables = db_util.log_all_tables()
 
     # Check for command-line arguments first, otherwise fall back to config
     if args.api_id and args.api_hash:
@@ -74,10 +78,17 @@ async def main():
     # The first parameter is the .session file name (absolute paths allowed)
     async with TelegramClient('anon', api_id, api_hash) as client:
         try:
-            logger.info("Client connected. Loading bot modules...")
-            await load_modules(client)
-            logger.info("All modules loaded. Running the client...")
+            # Load modules and send status updates
+            loaded_modules = await load_modules(client)
+            status_message = (
+                f"Bot has started successfully!\n"
+                f"Modules loaded: {', '.join(loaded_modules)}\n"
+                f"Database tables: {(tables)}\n"
+                f"Flask application is running on port 5000."
+            )
+            await client.send_message('me', status_message)
 
+            
             # Start the Flask app in a separate thread
             flask_thread = threading.Thread(target=run_flask_app, daemon=True)
             flask_thread.start()

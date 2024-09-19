@@ -18,8 +18,10 @@ def log_all_tables():
         
         if table_names:
             logger.info("Available tables in the database: %s", ', '.join(table_names))
+            return table_names
         else:
             logger.info("No tables found in the database.")
+            return []
     
     except Exception as e:
         logger.error(f"Error retrieving tables from the database: {e}")
