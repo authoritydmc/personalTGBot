@@ -19,7 +19,7 @@ async def run(client):
 
     @client.on(events.NewMessage(outgoing=True, pattern=command_pattern))
     async def handler(event):
-        """Handles new incoming messages."""
+        """Handles new outgoing messages."""
         
         if event.is_reply:
             # Extract the replied-to message ID and the chat ID
@@ -45,10 +45,9 @@ async def run(client):
             processed_count = 0
             
             # Iterate over messages sent after the replied-to message
-            
             async for message in client.iter_messages(
                     chat_id,
-                    min_id=replied_to_message_id ,  # Start with the next message
+                    min_id=replied_to_message_id,  # Start with the next message
                     reverse=False  # Change to True if you want to get messages in reverse order
                 ):
                 try:
@@ -56,40 +55,43 @@ async def run(client):
                     processed_count += 1
 
                     # Process each message
-                    logger.info(f"Processing message ID {message.id}. Content: {message.raw_text[:100]}")
-                    update_message = f"Processing message ID{message.id}"
+                    logger.info(f"Processing message ID {message.id}")
+                    update_message = f"Processing message ID {message.id}"
                     await client.edit_message(status_message, update_message)
 
-                    details = (
-                        f"Media received from: {chat_id}\n"
-                        f"Message ID: {message.id}\n"
-                        f"Caption: {message.text if message.text else 'No caption'}"
-                    )
-
-                    # Determine file path based on media type
+                    # Only handle messages with media (photo or video)
                     if message.media:
+                        # Handle photos
                         if isinstance(message.media, types.MessageMediaPhoto):
                             file_extension = '.jpg'
+                            file_path = os.path.join(media_dir, f"{message.id}{file_extension}")
+                            await message.download_media(file_path)
+                            logger.info(f"Photo saved to {file_path}")
+
+                        # Handle videos
                         elif isinstance(message.media, types.MessageMediaDocument):
                             mime_type = message.media.document.mime_type
-                            if mime_type.startswith('video'):
+                            if mime_type.startswith('video/'):
                                 file_extension = '.mp4'
+                                file_path = os.path.join(media_dir, f"{message.id}{file_extension}")
+                                await message.download_media(file_path)
+                                logger.info(f"Video saved to {file_path}")
                             else:
-                                file_extension = '.doc'  # Fallback for other types
+                                logger.info(f"Skipping non-video document in message ID {message.id}")
                         else:
-                            file_extension = '.bin'  # Fallback for unknown types
+                            logger.info(f"Skipping unknown media type in message ID {message.id}")
 
-                        file_path = os.path.join(media_dir, f"{message.id}{file_extension}")
-
-                        # Download media
-                        await message.download_media(file_path)
-                        logger.info(f"Media saved to {file_path}")
-
-                        # Send details and media
-                        await client.send_message('me', details, file=file_path)
+                        # Send details and media if it's either a photo or video
+                        if file_path:
+                            details = (
+                                f"Media received from: {chat_id}\n"
+                                f"Message ID: {message.id}\n"
+                                f"Caption: {message.text if message.text else 'No caption'}"
+                            )
+                            await client.send_message('me', details, file=file_path)
 
                     # Update status message with the number of processed messages
-                    update_message = f"Processed {message.id} |{processed_count} messages so far. Last media saved to {file_path}."
+                    update_message = f"Processed {processed_count} messages so far. Last media saved to {file_path}."
                     await client.edit_message(status_message, update_message)
 
                 except Exception as e:
