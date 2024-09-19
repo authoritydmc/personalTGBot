@@ -29,10 +29,10 @@ jobs:
 
     - name: Tag Docker image
       run: |
-        docker tag eureka-server:${{ env.TIMESTAMP }} ${{ secrets.DOCKER_HUB_USERNAME }}/eureka-server:latest
-        docker tag eureka-server:${{ env.TIMESTAMP }} ${{ secrets.DOCKER_HUB_USERNAME }}/eureka-server:${{ env.TIMESTAMP }}
+        docker tag tgbot:${{ env.TIMESTAMP }} ${{ secrets.DOCKER_HUB_USERNAME }}/tgbot:latest
+        docker tag tgbot:${{ env.TIMESTAMP }} ${{ secrets.DOCKER_HUB_USERNAME }}/tgbot:${{ env.TIMESTAMP }}
 
     - name: Push Docker images to Docker Hub
       run: |
-        docker push ${{ secrets.DOCKER_HUB_USERNAME }}/eureka-server:latest
-        docker push ${{ secrets.DOCKER_HUB_USERNAME }}/eureka-server:${{ env.TIMESTAMP }}
+        docker push ${{ secrets.DOCKER_HUB_USERNAME }}/tgbot:latest
+        docker push ${{ secrets.DOCKER_HUB_USERNAME }}/tgbot:${{ env.TIMESTAMP }}
