@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bot Dashboard</title>
+    <style>
+        body { font-family: Arial, sans-serif; }
+        .container { width: 80%; margin: 0 auto; }
+        img { max-width: 200px; margin: 10px; }
+        h1, h2 { color: #333; }
+        .status { margin-bottom: 20px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Bot Dashboard</h1>
+        
+        <div class="status">
+            <h2>Bot Status</h2>
+            <p>Status: {{ bot_status }}</p>
+        </div>
+        
+        <div class="images">
+            <h2>Saved Images</h2>
+            {% for image in images %}
+                <img src="{{ url_for('get_image', filename=image) }}" alt="{{ image }}">
+            {% endfor %}
+        </div>
+
+        <div class="modules">
+            <h2>Modules</h2>
+            <ul id="modules-list"></ul>
+        </div>
+    </div>
+
+    <script>
+        // Fetch and display modules
+        fetch('/modules')
+            .then(response => response.json())
+            .then(data => {
+                const modulesList = document.getElementById('modules-list');
+                data.modules.forEach(module => {
+                    const li = document.createElement('li');
+                    li.textContent = module;
+                    modulesList.appendChild(li);
+                });
+            });
+    </script>
+</body>
+</html>

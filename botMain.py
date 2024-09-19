@@ -2,9 +2,11 @@ import argparse
 import logging
 import importlib
 import os
+import threading
+import asyncio
 from telethon import TelegramClient
 from utils import db_util
-import asyncio
+from webapp.app import app as flask_app  # Import the Flask app instance
 
 # Configure logging for this script
 logging.basicConfig(format='[%(levelname) 5s/%(asctime)s] %(name)s: %(message)s',
@@ -12,6 +14,14 @@ logging.basicConfig(format='[%(levelname) 5s/%(asctime)s] %(name)s: %(message)s'
 logger = logging.getLogger(__name__)
 
 MODULES_FOLDER = "modules"
+
+def run_flask_app():
+    """Run the Flask app and handle exceptions."""
+    try:
+        flask_app.run(debug=True, port=5000)  # Access the Flask app instance
+        logger.info("Flask application is running.")
+    except Exception as e:
+        logger.error(f"Flask application encountered an error: {e}")
 
 async def load_modules(client):
     """Dynamically load all modules from the 'modules' folder and run them"""
@@ -36,30 +46,29 @@ async def main():
 
     # Parse the arguments
     args = parser.parse_args()
-    
+
     # Initialize the database and log available tables
     db_util.initialize_db()
     db_util.log_all_tables()
 
-    # Check if API credentials are stored in the database
-    credentials = db_util.get_api_credentials()
-    if not credentials:
-        logger.info("No API credentials found in the database.")
-        
-        # Prompt the user for credentials
-        api_id = input("Enter your Telegram API ID: ")
-        api_hash = input("Enter your Telegram API Hash: ")
-        
-        # Store the provided credentials in the database
-        db_util.set_api_credentials(api_id, api_hash)
-        logger.info("API credentials have been saved to the database.")
+    # Check for command-line arguments first, otherwise fall back to config
+    if args.api_id and args.api_hash:
+        api_id = args.api_id
+        api_hash = args.api_hash
     else:
-        api_id, api_hash = credentials
-        logger.info("API credentials loaded from the database.")
+        logger.info("No command-line arguments provided, loading API credentials from config.")
+        api_credentials = db_util.get_api_credentials()
+        if not api_credentials:
+            logger.info("No credentials found. Please enter them.")
+            api_id = int(input("Enter your API ID: "))
+            api_hash = input("Enter your API Hash: ")
+            db_util.set_api_credentials(api_id, api_hash)
+        else:
+            api_id, api_hash = api_credentials
 
     # Ensure api_id is an integer as required by Telethon
     api_id = int(api_id)
-    
+
     logger.info(f"Starting TelegramClient with API ID: {api_id}")
 
     # The first parameter is the .session file name (absolute paths allowed)
@@ -68,7 +77,14 @@ async def main():
             logger.info("Client connected. Loading bot modules...")
             await load_modules(client)
             logger.info("All modules loaded. Running the client...")
+
+            # Start the Flask app in a separate thread
+            flask_thread = threading.Thread(target=run_flask_app, daemon=True)
+            flask_thread.start()
+
+            # Run the Telegram client
             await client.run_until_disconnected()
+            logger.info("Telegram client disconnected.")
         except Exception as e:
             logger.error(f"An error occurred: {e}")
 

@@ -1,7 +1,7 @@
 import logging
 from .db_setup import create_db
 from .db_credentials import set_credentials, get_credentials
-from .db_users import add_reading_user, remove_reading_user, get_reading_users
+from .db_users import add_reading_user, remove_reading_user, get_reading_users,user_exists
 from .db_media import log_media
 from .log_all_tables import log_all_tables as logTables
 # Configure logging for this module
@@ -58,6 +58,8 @@ def remove_user_from_reading_list(username):
     except Exception as e:
         logger.error(f"Failed to remove user '{username}' from the reading list: {e}")
 
+def is_reading_user_exists(user):
+    return user_exists(user)
 def get_reading_user_list():
     """Get the list of users who are allowed to be read."""
     logger.info("Retrieving the list of reading users.")
