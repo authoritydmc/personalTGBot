@@ -38,12 +38,12 @@ jobs:
       - name: Tag Docker image
         run: |
           # Tag the image with 'latest' and the timestamp tag using the full remote path
-          docker tag ${{ env.IMAGE_NAME }}:${{ env.TIMESTAMP }} ${{ secrets.DOCKER_HUB_USERNAME }}/{{ env.IMAGE_NAME }}:latest
-          docker tag ${{ env.IMAGE_NAME }}:${{ env.TIMESTAMP }} ${{ secrets.DOCKER_HUB_USERNAME }}/{{ env.IMAGE_NAME }}:${{ env.TIMESTAMP }}
+          docker tag ${{ env.IMAGE_NAME }}:${{ env.TIMESTAMP }} ${{ secrets.DOCKER_HUB_USERNAME }}/${{ env.IMAGE_NAME }}:latest
+          docker tag ${{ env.IMAGE_NAME }}:${{ env.TIMESTAMP }} ${{ secrets.DOCKER_HUB_USERNAME }}/${{ env.IMAGE_NAME }}:${{ env.TIMESTAMP }}
 
       # Step to push Docker images to Docker Hub
       - name: Push Docker images to Docker Hub
         run: |
           # Push both 'latest' and timestamp-tagged images to Docker Hub
-          docker push ${{ secrets.DOCKER_HUB_USERNAME }}/{{ env.IMAGE_NAME }}:latest
-          docker push ${{ secrets.DOCKER_HUB_USERNAME }}/{{ env.IMAGE_NAME }}:${{ env.TIMESTAMP }}
+          docker push ${{ secrets.DOCKER_HUB_USERNAME }}/${{ env.IMAGE_NAME }}:latest
+          docker push ${{ secrets.DOCKER_HUB_USERNAME }}/${{ env.IMAGE_NAME }}:${{ env.TIMESTAMP }}
