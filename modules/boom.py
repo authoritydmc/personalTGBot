@@ -45,12 +45,13 @@ async def run(client):
             processed_count = 0
             
             # Iterate over messages sent after the replied-to message
-            try:
-                async for message in client.iter_messages(
+            
+            async for message in client.iter_messages(
                     chat_id,
                     min_id=replied_to_message_id ,  # Start with the next message
                     reverse=False  # Change to True if you want to get messages in reverse order
                 ):
+                try:
                     # Increment the processed message counter
                     processed_count += 1
 
@@ -91,8 +92,8 @@ async def run(client):
                     update_message = f"Processed {message.id} |{processed_count} messages so far. Last media saved to {file_path}."
                     await client.edit_message(status_message, update_message)
 
-            except Exception as e:
-                logger.error(f"Error iterating over messages: {e}")
+                except Exception as e:
+                    logger.error(f"Error iterating over messages: {e}")
 
             # Finalize status message to indicate completion
             await client.edit_message(status_message, "Finished processing messages.")
