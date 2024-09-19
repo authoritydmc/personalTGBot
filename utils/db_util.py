@@ -62,10 +62,8 @@ def is_reading_user_exists(user):
     return user_exists(user)
 def get_reading_user_list():
     """Get the list of users who are allowed to be read."""
-    logger.info("Retrieving the list of reading users.")
     try:
         users = get_reading_users()
-        logger.info("List of reading users retrieved successfully.")
         return users
     except Exception as e:
         logger.error(f"Failed to retrieve the list of reading users: {e}")
