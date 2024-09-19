@@ -15,7 +15,6 @@ logger = logging.getLogger(__name__)
 
 MODULES_FOLDER = "modules"
 
-
 def run_flask_app():
     """Run the Flask app and handle exceptions."""
     try:
@@ -55,15 +54,20 @@ async def main():
     db_util.initialize_db()
     tables = db_util.log_all_tables()
 
-    # Check for command-line arguments first, otherwise fall back to config
-    if args.api_id and args.api_hash:
-        api_id = args.api_id
-        api_hash = args.api_hash
-    else:
-        logger.info("No command-line arguments provided, loading API credentials from config.")
+    # Attempt to get API credentials from command-line arguments, environment variables, or database
+    api_id = args.api_id
+    api_hash = args.api_hash
+
+    if not api_id or not api_hash:
+        # Load API credentials from environment variables if not provided via command-line arguments
+        api_id = os.getenv('TELEGRAM_API_ID')
+        api_hash = os.getenv('TELEGRAM_API_HASH')
+
+    if not api_id or not api_hash:
+        # Load API credentials from the database if not provided via command-line arguments or environment variables
         api_credentials = db_util.get_api_credentials()
         if not api_credentials:
-            logger.info("No credentials found. Please enter them.")
+            logger.info("No credentials found in environment variables or database. Please enter them.")
             api_id = int(input("Enter your API ID: "))
             api_hash = input("Enter your API Hash: ")
             db_util.set_api_credentials(api_id, api_hash)
@@ -88,7 +92,6 @@ async def main():
             )
             await client.send_message('me', status_message)
 
-            
             # Start the Flask app in a separate thread
             flask_thread = threading.Thread(target=run_flask_app, daemon=True)
             flask_thread.start()
