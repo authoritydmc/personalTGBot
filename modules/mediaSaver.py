@@ -16,7 +16,7 @@ async def run(client):
     async def handler(event):
         # Determine sender info: username or user ID
         sender_username = event.sender.username if event.sender and event.sender.username else None
-        sender_id = event.sender.id if event.sender and event.sender.id else 'unknown_id'
+        sender_id = event.peer_id.user_id if event.peer_id  else 'unknown_id'
 
         if sender_username:
             user_identifier = sender_username
@@ -25,11 +25,8 @@ async def run(client):
         
         # Check if the sender is in the list of reading users
         reading_users = db_util.get_reading_user_list()
-        if sender_username and sender_username not in reading_users:
-            logger.info(f"Message from '{sender_username}' is not in the reading users list. Ignoring. {event.raw_text[:20]}")
-            return
-        elif not sender_username and sender_id not in reading_users:
-            logger.info(f"Message from '{user_identifier}' (ID) is not in the reading users list. Ignoring. {event.raw_text[:20]}")
+        if user_identifier not in reading_users:
+            logger.info(f"Message from '{user_identifier}' is not in the reading users list. Ignoring. {event.raw_text[:20]}")
             return
 
         # Determine the directory to save the media
