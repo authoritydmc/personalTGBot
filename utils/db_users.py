@@ -7,7 +7,7 @@ def add_reading_user(username):
     cursor = conn.cursor()
 
     try:
-        cursor.execute('INSERT INTO add_reading_users (username) VALUES (?)', (username,))
+        cursor.execute('INSERT INTO reading_users (username) VALUES (?)', (username,))
         conn.commit()
         print(f"User '{username}' added to reading users.")
     except sqlite3.IntegrityError:
@@ -19,7 +19,7 @@ def remove_reading_user(username):
     conn = sqlite3.connect(DB_PATH)
     cursor = conn.cursor()
 
-    cursor.execute('DELETE FROM add_reading_users WHERE username = ?', (username,))
+    cursor.execute('DELETE FROM reading_users WHERE username = ?', (username,))
     conn.commit()
     conn.close()
     print(f"User '{username}' removed from reading users.")
@@ -29,7 +29,7 @@ def get_reading_users():
     conn = sqlite3.connect(DB_PATH)
     cursor = conn.cursor()
 
-    cursor.execute('SELECT username FROM add_reading_users')
+    cursor.execute('SELECT username FROM reading_users')
     users = cursor.fetchall()
     conn.close()
 
