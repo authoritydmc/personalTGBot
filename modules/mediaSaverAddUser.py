@@ -61,7 +61,7 @@ async def run(client):
                 try:
                     users = db_util.get_reading_users()
                     if users:
-                        user_list = "\n".join(users)
+                        user_list = "\n".join([f"`{user}`" for user in users])
                         await event.reply(f"Reading users:\n{user_list}")
                         logger.info(f"Retrieved reading users: {users}")
                     else:

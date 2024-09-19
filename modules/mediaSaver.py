@@ -16,18 +16,37 @@ async def run(client):
     async def handler(event):
         # Determine sender info: username or user ID
         sender_username = event.sender.username if event.sender and event.sender.username else None
-        sender_id = event.peer_id.user_id if event.peer_id  else 'unknown_id'
+        sender_id = str(event.peer_id.user_id) if event.peer_id  else 'unknown_id'
 
         if sender_username:
             user_identifier = sender_username
         else:
             user_identifier = str(sender_id)
-        
+
+
         # Check if the sender is in the list of reading users
         reading_users = db_util.get_reading_user_list()
-        if user_identifier not in reading_users:
-            logger.info(f"Message from '{user_identifier}' is not in the reading users list. Ignoring. {event.raw_text[:20]}")
+        # logger.info(f"Allowed users: {reading_users}")
+        # logger.info(f"Checking sender: username='{sender_username}', ID='{sender_id}'")
+        # logger.info(f"Type of sender ID: {type(sender_id)}")
+        # logger.info(f"Type of elements in reading_users: {[type(user) for user in reading_users]}")
+        # Determine if the sender ID is allowed
+        id_allowed = sender_id in reading_users
+        # logger.info(f"Sender ID '{sender_id}' allowed: {id_allowed}")
+
+        # Determine if the sender username is allowed
+        username_allowed = sender_username in reading_users if sender_username else False
+        # logger.info(f"Sender username '{sender_username}' allowed: {username_allowed}")
+
+        # Determine if the sender is overall allowed
+        user_allowed = id_allowed or username_allowed
+        logger.info(f"Overall user allowed: {user_allowed} {user_identifier}")
+
+        if not user_allowed:
+            logger.info(f"User with ID '{sender_id}' or username '{sender_username}' is not in the reading users list. Ignoring message: {event.raw_text[:20]}")
             return
+
+
 
         # Determine the directory to save the media
         save_dir = os.path.join('data', user_identifier)
