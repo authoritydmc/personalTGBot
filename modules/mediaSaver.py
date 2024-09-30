@@ -52,11 +52,9 @@ async def run(client):
         save_dir = os.path.join('data', user_identifier)
         os.makedirs(save_dir, exist_ok=True)  # Create directory if it doesn't exist
 
-        # Update message status
-        status_message = await client.send_message('me', f"Received message from {user_identifier}. Preparing to download...")
-
         try:
             if isinstance(event.message.media, MessageMediaPhoto):
+                status_message = await client.send_message('me', f"Received message from {user_identifier}. Preparing to download... (ID: {event.message.id})")
                 file_path = os.path.join(save_dir, f"{event.message.id}.jpg")
                 await client.edit_message(status_message, f"Starting download of photo (ID: {event.message.id})...")
 
@@ -81,6 +79,7 @@ async def run(client):
 
             elif isinstance(event.message.media, MessageMediaDocument):
                 if event.message.media.document.mime_type.startswith('video'):
+                    status_message = await client.send_message('me', f"Received message from {user_identifier}. Preparing to download... (ID: {event.message.id})")
                     file_path = os.path.join(save_dir, f"{event.message.id}.mp4")
                     await client.edit_message(status_message, f"Starting download of video (ID: {event.message.id})...")
 
@@ -103,7 +102,6 @@ async def run(client):
                     db_util.log_media_info(user_identifier, 'video', file_path)
 
         except Exception as e:
-            await client.edit_message(status_message, f"Failed to handle media: {e}")
             logger.error(f"Failed to handle media: {e}")
 
     logger.info("MediaSaver is listening for new messages.")
