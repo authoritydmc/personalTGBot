@@ -22,16 +22,44 @@ def get_git_info(command):
         return None
 
 # Function to generate Git version information
+import subprocess
+
+def get_git_info(command):
+    """Executes a git command and returns the output."""
+    try:
+        return subprocess.check_output(command, shell=True, text=True).strip()
+    except subprocess.CalledProcessError as e:
+        print(f"Error executing command '{command}': {e}")
+        return None
+
+def generate_version_id(tag, commit_count):
+    """Generates a version ID based on the tag and commit count."""
+    if tag is not None:
+        # Convert tag from vX.Y.Z format to a numeric ID
+        tag_parts = tag.lstrip('v').split('.')
+        return int(tag_parts[0]) * 10000 + int(tag_parts[1]) * 100 + int(tag_parts[2]) + int(commit_count)
+    return int(commit_count)
+
 def generate_git_info():
     git_info = {}
     git_info['commit_hash'] = get_git_info("git rev-parse HEAD")
     git_info['branch_name'] = get_git_info("git rev-parse --abbrev-ref HEAD")
-    git_info['tag'] = get_git_info("git describe --tags --abbrev=0")
+    git_info['tag'] = get_git_info("git describe --tags --abbrev=0") or "No tag"
     git_info['commit_date'] = get_git_info("git log -1 --format=%cd --date=iso-strict")
     git_info['remote_url'] = get_git_info("git config --get remote.origin.url")
-    git_info['commit_count'] = get_git_info("git rev-list --count HEAD")
-    git_info['versionID']=generate_version_id(git_info.get('tag'),git_info.get('commit_count'))
+    
+    # Determine the commit count based on the presence of a tag
+    if git_info['tag'] != "No tag":
+        # Get commit count since the last tag
+        git_info['commit_count'] = get_git_info("git rev-list {}..HEAD --count".format(git_info['tag']))
+    else:
+        # Get total commit count from the beginning
+        git_info['commit_count'] = get_git_info("git rev-list --count HEAD")
+    
+    git_info['versionID'] = generate_version_id(git_info.get('tag'), git_info.get('commit_count'))
+    
     return git_info
+
 
 # Function to gather system information
 def generate_system_info():
