@@ -13,7 +13,9 @@ jobs:
     steps:
       # Step to check out the repository
       - uses: actions/checkout@v4
-
+        with:
+          fetch-depth: 0          # Fetch all history for all tags
+          fetch-tags: true        # Fetch all tags from the remote repository
       # Step to set up Python environment
       - name: Set up Python
         uses: actions/setup-python@v4
