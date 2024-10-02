@@ -8,7 +8,7 @@ import sys
 
 # Path to version.json file
 DATA_FOLDER = "data"
-VERSION_FILE_PATH = os.path.join(DATA_FOLDER, "version.json")
+VERSION_FILE_PATH = os.path.join(".","version.json")
 
 # Function to execute a git command and return its output
 def get_git_info(command):

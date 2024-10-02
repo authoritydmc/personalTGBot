@@ -14,6 +14,29 @@ jobs:
       # Step to check out the repository
       - uses: actions/checkout@v4
 
+      # Step to set up Python environment
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.x'
+
+      # Step to install dependencies (if any are required by version.py)
+      - name: Install Python dependencies
+        run: |
+          python -m pip install --upgrade pip
+          # Add any required Python dependencies here (if needed)
+          # For example:
+          # pip install -r requirements.txt
+
+      # Step to run the version.py script and generate version.json
+      - name: Generate version.json
+        id: genVer
+        run: |
+          python version.py
+        # Add version.json to GitHub Actions output so other steps can access it
+        outputs:
+          version_file: ${{ steps.genVer.outputs.version_file }}
+
       # Step to build the Docker image and set the tag once
       - name: Build the Docker image
         id: build

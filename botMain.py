@@ -147,6 +147,5 @@ async def main():
 # Entry point for the script
 if __name__ == "__main__":
     logger.info("Bot is starting...")
-    version.main()
     asyncio.run(main())
     logger.info("Bot has stopped.")

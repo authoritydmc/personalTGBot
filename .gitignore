@@ -4,3 +4,4 @@ Pipfile
 data
 *.session-journal
 bot.db
+version.json
