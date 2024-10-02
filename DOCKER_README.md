@@ -20,6 +20,42 @@ To run the Docker container with automatic restart and mount the `data` folder t
 docker run -it --restart unless-stopped --name telegram-bot -p 5000:5000 -v /path/on/host/data:/app/data telegram-bot
 ```
 
+Here’s a concise version of the README for running the Docker container for your Telegram bot:
+
+---
+
+### Running the Docker Container for Telegram Bot
+
+#### Initial Setup (Generate Session File)
+
+Run the following command to generate the session file for the first time:
+
+```sh
+docker run -it --restart unless-stopped --name telegram-bot -p 5000:5000 -v /path/on/host/data:/app/data rajlabs/tgbot
+```
+
+#### Subsequent Runs (Detached Mode)
+
+After signing in, stop and remove the old container:
+
+```sh
+docker stop telegram-bot
+docker rm telegram-bot
+```
+
+Then, start the container in detached mode:
+
+```sh
+docker run -d --restart unless-stopped --name telegram-bot -p 5000:5000 -v /path/on/host/data:/app/data rajlabs/tgbot
+```
+
+### Note
+
+Replace `/path/on/host/data` with your actual host path.
+
+
+
+
 **Explanation**:
 - `--restart unless-stopped`: This policy ensures that the container is automatically restarted if it exits due to an error or system reboot, but not if it is manually stopped.
 - `-v /path/on/host/data:/app/data`: Mounts the `data` directory on the host (`/path/on/host/data`) to the `data` directory in the container (`/app/data`). Replace `/path/on/host/data` with the path to the directory on your host system where you want to store the data files.
