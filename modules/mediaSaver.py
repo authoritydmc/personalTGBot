@@ -64,10 +64,10 @@ async def run(client):
                 await client.edit_message(status_message, f"Photo downloaded successfully!\nSaved to: {file_path}")
 
                 details = (
-                    f"Photo received from: {user_identifier}\n"
+                    f"Photo received from: `{user_identifier}`\n"
                     f"Message ID: {event.message.id}\n"
-                    f"Caption: {event.message.text if event.message.text else 'No caption'}"
-                    f"Status:{status_message.message}"
+                    f"Caption: {event.message.text if event.message.text else 'No caption'}\n"
+                    f"path: `{file_path}`"
                 )
                 await status_message.delete()
                 
@@ -89,10 +89,10 @@ async def run(client):
                     await client.edit_message(status_message, f"Video downloaded successfully!\nSaved to: {file_path}")
 
                     details = (
-                        f"Video received from: {user_identifier}\n"
+                        f"Video received from: `{user_identifier}`\n"
                         f"Message ID: {event.message.id}\n"
-                        f"Caption: {event.message.text if event.message.text else 'No caption'}"
-                       f"Status:{status_message.message}"
+                        f"Caption: {event.message.text if event.message.text else 'No caption'}\n"
+                        f"path: `{file_path}`"
                         )
                     await status_message.delete()
                     await client.send_message('me', details, file=file_path)
