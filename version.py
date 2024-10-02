@@ -101,7 +101,7 @@ def generate_version_id(tag, commit_count):
         commit_count = 0
 
     # Calculate the integer-based version ID
-    version_id = (major * 10000) + (minor * 100) + patch + commit_count
+    version_id = (major * 100000) + (minor * 1000) + patch*100 + commit_count
     return version_id
 
 # Function to load version info from JSON file
