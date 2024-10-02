@@ -95,16 +95,20 @@ async def main():
     version_info = version.load_version_info()
     if not version_info:
         logger.warning("Version information is unavailable.")
+        version.main()
     else:
         git_info = version_info.get('git', {})
         build_info = version_info.get('build', {})
+
        # Get the Git information
     commit_count = git_info.get('commit_count', 'N/A') if version_info else 'N/A'
     commit_hash = git_info.get('commit_hash', 'N/A') if version_info else 'N/A'
     branch_name = git_info.get('branch_name', 'N/A') if version_info else 'N/A'
     tag = git_info.get('tag', 'N/A') if version_info else 'N/A'
     commit_date = git_info.get('commit_date', 'N/A') if version_info else 'N/A'
-    versionID=git_info.get('versionID')
+    versionID=git_info.get('versionID','N/A') if version_info else 'N/A'
+
+
 
     # Get the Build information
     build_username = build_info.get('username', 'N/A') if version_info else 'N/A'
