@@ -8,7 +8,7 @@ import socket
 from telethon import TelegramClient
 from utils import db_util
 from webapp.app import app as flask_app  # Import the Flask app instance
-
+import version
 # Configure logging for this script
 logging.basicConfig(format='[%(levelname) 5s/%(asctime)s] %(name)s: %(message)s',
                     level=logging.INFO)
@@ -91,7 +91,25 @@ async def main():
     
     # Specify the session file path within the data folder
     session_file_path = os.path.join(DATA_FOLDER, 'anon.session')
+    # Load version info from version.json using the version module
+    version_info = version.load_version_info()
+    if not version_info:
+        logger.warning("Version information is unavailable.")
+    else:
+        git_info = version_info.get('git', {})
+        build_info = version_info.get('build', {})
+       # Get the Git information
+    commit_count = git_info.get('commit_count', 'N/A') if version_info else 'N/A'
+    commit_hash = git_info.get('commit_hash', 'N/A') if version_info else 'N/A'
+    branch_name = git_info.get('branch_name', 'N/A') if version_info else 'N/A'
+    tag = git_info.get('tag', 'N/A') if version_info else 'N/A'
+    commit_date = git_info.get('commit_date', 'N/A') if version_info else 'N/A'
+    versionID=git_info.get('versionID')
 
+    # Get the Build information
+    build_username = build_info.get('username', 'N/A') if version_info else 'N/A'
+    build_hostname = build_info.get('hostname', 'N/A') if version_info else 'N/A'
+    build_timestamp = build_info.get('build_timestamp', 'N/A') if version_info else 'N/A'
     # Initialize TelegramClient with the session file path in the 'data' folder
     async with TelegramClient(session_file_path, api_id, api_hash) as client:
         try:
@@ -102,7 +120,17 @@ async def main():
                 f"Modules loaded: {', '.join(loaded_modules)}\n"
                 f"Database tables: {(tables)}\n"
                 f"Flask application is running on port 5000.\n"
-                f"Host: {hostname} ({ip_address})"
+                f"Host: {hostname} ({ip_address})\n"
+                f"🔧 **Git Info**:\n"
+                f"- Version : `{tag if tag else 'No tag'}-{commit_count}` (`{versionID}`)\n"
+                f"- Commit Hash: `{commit_hash[:10]}`\n"
+                f"- Branch Name: `{branch_name}`\n"
+                f"- Commit Date: {commit_date}\n\n"
+                f"🛠 **Build Info**:\n"
+                f"- Build Username: `{build_username}`\n"
+                f"- Build Hostname: `{build_hostname}`\n"
+                f"- Build Timestamp: {build_timestamp}\n"
+
             )
             await client.send_message('me', status_message)
 
@@ -119,5 +147,6 @@ async def main():
 # Entry point for the script
 if __name__ == "__main__":
     logger.info("Bot is starting...")
+    version.main()
     asyncio.run(main())
     logger.info("Bot has stopped.")
