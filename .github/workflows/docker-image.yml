@@ -18,7 +18,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
-          python-version: '3.x'
+          python-version: '3.12'
 
       # Step to install dependencies (if any are required by version.py)
       - name: Install Python dependencies
@@ -30,12 +30,8 @@ jobs:
 
       # Step to run the version.py script and generate version.json
       - name: Generate version.json
-        id: genVer
         run: |
           python version.py
-        # Add version.json to GitHub Actions output so other steps can access it
-        outputs:
-          version_file: ${{ steps.genVer.outputs.version_file }}
 
       # Step to build the Docker image and set the tag once
       - name: Build the Docker image
